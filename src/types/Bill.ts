@@ -7,3 +7,5 @@ export interface Bill {
   website?: string;          // OPTIONAL payment link
   apiIntegration?: string;   // OPTIONAL placeholder for future integration
 }
+
+
