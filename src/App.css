@@ -49,3 +49,82 @@ body {
   margin: 0 auto;
   padding: 20px;
 }
+
+/* Bills Table */
+
+.bills-table {
+  overflow: auto; /* controls both horizontal and vertical scrolling */
+  width: 100%;
+  border-collapse: collapse; /* or separate if you want spacing */
+  margin-top: 2rem; /* space from the form */
+  table-layout: fixed; /* optional: keeps column widths consistent */
+}
+
+.bills-table th,
+.bills-table td {
+  padding: 0.75rem 1rem; /* adds space inside cells */
+  text-align: center;    /* center content by default */
+  vertical-align: middle; /* middle-align for icons/progress bars */
+  border-bottom: 1px solid #ddd; /* optional separator line */
+}
+
+.bill-item {
+  background-color: rgb(238, 238, 238);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.bill-item:hover {
+  background-color: #e0e0e0;
+}
+
+.bill-item-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.bill-item-button:hover {
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Bill Input Form */
+
+.bill-input-form {
+  margin-top: 2rem;
+}
+
+.bill-input-group {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  margin: 0 0.5rem 0 0.5rem; /* horizontal margin for spacing between inputs */
+}
+
+.bill-input:focus {
+  border-color: #3fa3b5;
+  box-shadow: 0 0 5px rgba(63, 163, 181, 0.5);
+  outline: none;
+}
+
+.add-bill-button {
+  background-color: #3fa3b5;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-left: 1rem; /* extra space between the form fields and the button */
+}
+
+.add-bill-button:hover {
+  background-color: #3298a6;
+  box-shadow: 0 4px 8px rgba(50, 152, 166, 0.4);
+}

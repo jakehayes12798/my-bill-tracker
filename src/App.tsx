@@ -49,7 +49,7 @@ function App() {
                 <td>
                   <Tooltip title="Record a payment for this bill">
                       <IconButton
-                        className="record-payment-button"
+                        className="bill-item-button record-payment-button"
                         onClick={() => handleRecordPayment(bill.id)}
                         color="secondary"
                         disabled={bill.paidAmount >= bill.totalAmount}
@@ -61,7 +61,7 @@ function App() {
                 <td>
                     <Tooltip title="Edit this bill">
                       <IconButton
-                        className="edit-bill-button"
+                        className="bill-item-button edit-bill-button"
                         onClick={() => handleEditBill(bill.id)}
                         color="primary"
                       >
@@ -84,7 +84,7 @@ function App() {
                 <td>
                     <Tooltip title="Delete this bill">
                       <IconButton
-                        className="delete-bill-button"
+                        className="bill-item-button delete-bill-button"
                         onClick={() => handleDeleteBill(bill.id)}
                         color="error"
                       >

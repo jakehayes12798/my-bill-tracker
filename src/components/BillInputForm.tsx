@@ -38,23 +38,26 @@ function BillInputForm({ onAddBill }: BillFormProps) {
 
 
     return (
-        <form onSubmit={handleSubmit} className="bill-form">
+        <form onSubmit={handleSubmit} className="bill-input-form">
             <fieldset className="input-group bill-input-group">
-                <label htmlFor="billName">Bill Name:</label>
-                <input 
-                    required
-                    className="bill-input"
-                    type="text"
+                <span className="input-group bill-input-group">
+                    <label htmlFor="billName">Bill Name:</label>
+                    <input
+                        required
+                        className="bill-input"
+                        type="text"
                     id="billName"
                     name="billName"
                     value={billName}
                     onChange={(e) => setBillName(e.target.value)}
                 />
+                </span>
+                <span className="input-group bill-input-group">
                 <label htmlFor="billAmount">Amount:</label>
                 <input className="bill-input"
                     type="number"
                     id="billAmount"
-                    name="billAmount"
+                        name="billAmount"
                     placeholder="0"
                     value={billAmount}
                     onChange={(e) => {
@@ -70,6 +73,8 @@ function BillInputForm({ onAddBill }: BillFormProps) {
                         }
                     }}
                 />
+            </span>
+            <span className="input-group bill-input-group">
                 <label htmlFor="dueDate">Due Date:</label>
                 <input className="bill-input"
                     type="date"
@@ -78,7 +83,10 @@ function BillInputForm({ onAddBill }: BillFormProps) {
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
                 />
-                <button type="submit">Add Bill</button>
+            </span>
+            <span className="input-group bill-input-group">
+                <button type="submit" className="bill-input add-bill-button">Add Bill</button>
+            </span>
             </fieldset>
         </form>
     );
