@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { BillFormProps } from "../types/BillFormProps";
+import type { BillFormProps } from "./types/BillFormProps";
 import { v4 as uuidv4 } from "uuid";
-import type { Bill } from "../types/Bill";
+import type { Bill } from "./types/Bill";
 
-function BillInputForm({ onAddBill }: BillFormProps) {
+export default function BillInputForm({ onAddBill }: BillFormProps) {
 
     const [billName, setBillName] = useState("");
     const [billAmount, setBillAmount] = useState<number | "">("");
@@ -91,7 +91,3 @@ function BillInputForm({ onAddBill }: BillFormProps) {
         </form>
     );
 }
-
-
-
-export default BillInputForm;
