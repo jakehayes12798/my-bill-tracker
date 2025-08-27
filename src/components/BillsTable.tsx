@@ -1,6 +1,5 @@
 import { Payment, EditSquare, Delete } from "@mui/icons-material";
 import { Tooltip, IconButton, LinearProgress } from "@mui/material";
-import { handleRecordPayment, handleEditBill, handleDeleteBill } from "../utils/billUtils";
 import type { BillsTableProps } from "./types/BillsTableProps";
 
 export default function BillsTable({
@@ -8,7 +7,7 @@ export default function BillsTable({
   onRequestDelete,
   onRequestEdit,
   onRequestRecordPayment,
-}: BillsTableProps) {
+}: Readonly<BillsTableProps>) {
   return (
     <table className="bills-table">
       <thead>

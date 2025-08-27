@@ -7,13 +7,15 @@
  * By assigning away all the presentation, App.tsx can focus solely on logic and state.
  */
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import "./App.css";
 import BillInputForm from "./components/BillInputForm";
 import type { Bill } from "./components/types/Bill";
-import { handleDeleteBill, handleEditBill, handleRecordPayment, sortBills } from "./utils/billUtils";
+import { deleteBillUtil, editBillUtil, getRemainingBalance, recordPaymentUtil, sortBills } from "./utils/billUtils";
 import BillsTable from "./components/BillsTable";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { Save } from "@mui/icons-material";
+import { billEditSchema } from "./utils/formSchemas";
 
 function App() {
 
@@ -21,8 +23,6 @@ function App() {
   const sortedBills = useMemo(() => sortBills(bills), [bills]); // sorts whenever the bills array changes
 
   // ---------- Handlers for CRUD (useCallback for stable refs)
-  const addBill = useCallback((b: Bill) => setBills(prev => [...prev, b]), []);
-
   const confirmDelete = useCallback((id: string) => {
     setBills(prev => deleteBillUtil(prev, id));
   }, []);
@@ -31,13 +31,14 @@ function App() {
     setBills(prev => prev.map(b => b.id === id ? editBillUtil(b, fields) : b));
   }, []);
 
-  const applyPayment = useCallback((id: string, amount: number) => {
-    setBills(prev => prev.map(b => b.id === id ? recordPaymentUtil(b, amount) : b));
+  const applyPayment = useCallback((id: string, amount: number, date: string) => {
+    setBills(prev => prev.map(b => b.id === id ? recordPaymentUtil(b, amount, date) : b));
   }, []);
 
   // ------------ Dialog states
+  /* Delete Bill Functions */
   const [deleteTarget, setDeleteTarget] = useState<Bill | null>(null);
-  const openDelete = (bill: Bill) => (console.log("Opening delete for", bill), setDeleteTarget(bill));
+  const openDelete = (bill: Bill) => (setDeleteTarget(bill));
   const closeDelete = () => setDeleteTarget(null);
   const onConfirmDelete = () => {
     if (!deleteTarget) return;
@@ -45,23 +46,90 @@ function App() {
     closeDelete();
   };
 
+  /* Edit Dialog Helpers */
+  // State: The bill we are editing right now; null if no modal is open
   const [editTarget, setEditTarget] = useState<Bill | null>(null);
-  const openEdit = (bill: Bill) => (console.log("Opening edit for", bill), setEditTarget(bill));
+  // State: the form field values being edited
+  // Note: must be string|number for compatibility with <payment-dialog>'s <input value>
+  const [editValues, setEditValues] = useState<Partial<Bill>>({});
+  /**
+   * Opens the edit dialog for a specific bill and sets {@link editTarget} to that bill.
+   * @param bill The bill to edit.
+   * @returns void
+   */
+  const openEdit = (bill: Bill) => (setEditTarget(bill));
+  /**
+   * Closes the edit dialog and sets {@link editTarget} to null.
+   * @returns void
+   */
   const closeEdit = () => setEditTarget(null);
-  const onConfirmEdit = (updatedFields: Partial<Bill>) => {
+  const onConfirmEdit = () => {
     if (!editTarget) return;
-    applyEdit(editTarget.id, updatedFields);
+    applyEdit(editTarget.id, editValues);
     closeEdit();
   };
+  useEffect(() => {
+  if (editTarget) {
+    const initialValues: Record<string, string | number> = {};
+    billEditSchema.forEach(({ key }) => {
+      initialValues[key] = editTarget[key as keyof Bill] ?? "";
+    });
+    setEditValues(initialValues);
+  }
+}, [editTarget]);
 
+
+  /* Record Payment Functions */
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [datePaid, setDatePaid] = useState(new Date().toISOString().split("T")[0]);
   const [paymentTarget, setPaymentTarget] = useState<Bill | null>(null);
-  const openPayment = (bill: Bill) => (console.log("Opening payment for", bill), setPaymentTarget(bill));
+  const openPayment = (bill: Bill) => (setPaymentTarget(bill));
   const closePayment = () => setPaymentTarget(null);
-  const onConfirmPayment = (amount: number) => {
+  const onConfirmPayment = () => {
     if (!paymentTarget) return;
-    applyPayment(paymentTarget.id, amount);
+    applyPayment(paymentTarget.id, paymentAmount, datePaid);
     closePayment();
   };
+  useEffect(() => {
+    if (paymentTarget) {
+      setPaymentAmount(getRemainingBalance(paymentTarget));
+      setDatePaid(new Date().toISOString().split("T")[0]);
+    }
+  }, [paymentTarget]);
+
+/** This was removed for using getElementById - that's not best practice. 
+   * Handles the saving of edited bill information.
+  const handleEditFormSave = () => {
+  if (!editTarget) return;
+
+  const formData = new FormData(document.getElementById("edit-form") as HTMLFormElement);
+  const updatedFields: Partial<Bill> = {};
+
+  billEditSchema.forEach(({ key, type }) => {
+    const value = formData.get(key);
+    if (value === null) return;
+
+    if (type === "number") updatedFields[key] = parseFloat(value as string);
+    else updatedFields[key] = value as string;
+  });
+
+  onConfirmEdit(updatedFields);
+};
+
+/**
+ * Handles the saving of recorded payment information.
+ * @returns void
+
+const handleRecordPaymentFormSave = () => {
+  if(!paymentTarget) return;
+
+  const formData = new FormData(document.getElementById("payment-form") as HTMLFormElement);
+  const paymentAmount = parseFloat(formData.get("payment-amount") as string);
+  const datePaid = formData.get("date-paid") as string;
+
+  onConfirmPayment(paymentAmount, datePaid);
+};
+*/
 
   /**
    * Handles the addition of a new bill to the state.
@@ -84,8 +152,8 @@ function App() {
         <BillsTable
         bills={sortedBills}
         onRequestDelete={(bill) => openDelete(bill)}
-        onRequestEdit={(bill) => {/* open edit dialog with bill */}}
-        onRequestRecordPayment={(bill) => {/* open payment dialog */}}
+        onRequestEdit={(bill) => openEdit(bill)}
+        onRequestRecordPayment={(bill) => openPayment(bill)}
       />
       </main>
 
@@ -100,8 +168,76 @@ function App() {
           </div>}
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDelete}>Cancel</Button>
+          <Button onClick={closeDelete} color="error" variant="outlined">Cancel</Button>
           <Button onClick={onConfirmDelete} color="error" variant="contained">I'm Sure; Delete</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Payment dialog */}
+      <Dialog id="payment-dialog" open={!!paymentTarget} onClose={closePayment}>
+          <DialogTitle>Record Payment for {paymentTarget?.name}</DialogTitle>
+          <DialogContent>
+            {paymentTarget && (
+              <fieldset>
+                <label htmlFor="payment-amount">Payment Amount:</label>
+                <input
+                  type="number"
+                  id="payment-amount"
+                  name="payment-amount"
+                  min="0"
+                  max={getRemainingBalance(paymentTarget)}
+                  step="0.01"
+                  autoFocus
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(parseFloat(e.target.value))}
+                />
+                <p>Remaining: ${getRemainingBalance(paymentTarget)}</p>
+                <label htmlFor="date-paid">Date Paid:</label>
+                <input
+                  type="date"
+                  id="date-paid"
+                  name="date-paid"
+                  value={datePaid}
+                  onChange={e => setDatePaid(e.target.value)}// defaults to today
+                />
+              </fieldset>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closePayment} color="error" variant="outlined">Cancel</Button>
+            <Button onClick={onConfirmPayment} color="primary" variant="contained">Confirm Payment</Button>
+          </DialogActions>
+      </Dialog>
+
+      {/* Edit dialog */}
+      <Dialog open={!!editTarget} onClose={closeEdit}>
+        <DialogTitle>Edit {editTarget?.name}</DialogTitle>
+        <DialogContent>
+          {/* Blow apart the editTarget and create form fields for each of the USER EDITABLE fields that we've defined in the Schema for the bill */}
+          {editTarget && (
+            <fieldset>
+              {billEditSchema.map(({ key, label, type }) => (
+                <div key={key}>
+                  <label htmlFor={key}>{label}:</label>
+                  <input
+                    id={key}
+                    name={key}
+                    type={type}
+                    value={editValues[key] ?? ""}
+                    onChange={e => setEditValues(prev => ({
+                      ...prev,
+                      [key]: type === "number" ? parseFloat(e.target.value) : e.target.value
+                    }))}
+                  />
+
+                </div>
+              ))}
+            </fieldset>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeEdit} color="error" variant="outlined">Cancel</Button>
+          <Button onClick={onConfirmEdit} color="primary" variant="contained" startIcon={<Save />}>Save Changes</Button>
         </DialogActions>
       </Dialog>
 

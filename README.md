@@ -1,4 +1,8 @@
-# My Bill Tracker
+<sub>Created: 2025/08/26 09:44:39
+<br/>Last modified: 2025/08/27 11:26:00
+</sub>
+
+# My Bill Tracker <!-- omit from toc -->
 
 A personal finance tracker built with **React + TypeScript**.  
 The goal of this project is to create a clean, modern, and customizable way to manage recurring bills, forecast upcoming expenses, and stay on top of financial commitments.
@@ -9,11 +13,18 @@ This app is designed not only as a practical tool, but also as a showcase of my 
 - **Clear separation of concerns** between data models, utilities, and UI components  
 - A visually intuitive interface that makes bills, due dates, and forecasts easy to digest at a glance
 
----
+
+
+
+[Features (Planned \& In Progress)](#features-planned--in-progress) |
+[Tech Stack](#tech-stack) |
+[Why This Project?](#why-this-project) |
+[Getting Started](#getting-started)
+
 
 ## Features (Planned & In Progress)
 
-- 📌 Add, edit, and delete recurring bills  
+- [ ] 📌 Add, edit, and delete recurring bills  
 - 📆 See upcoming due dates on a timeline/calendar view  
 - 💰 Track variances between expected vs. actual amounts  
 - 📊 Forecast future expenses across months  
