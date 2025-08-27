@@ -15,11 +15,11 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  flex: 1;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   color: #333;
   height: 100vh; /* full screen height */
-  background-color: #f8fafc; /* soft gray background */
 }
 
 /* Header container */
@@ -127,4 +127,27 @@ body {
 .add-bill-button:hover {
   background-color: #3298a6;
   box-shadow: 0 4px 8px rgba(50, 152, 166, 0.4);
+}
+
+/* Make the root container a flex column that fills the viewport */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The main content should grow to take all remaining space */
+main {
+  flex: 1;
+  width: 100%;
+}
+
+/* Footer stays at the bottom */
+footer {
+  background: rgb(218, 216, 216);
+  padding: 1rem;
+  border-top: 1px solid #eee;
+  text-align: center;
+  min-width: 100%;
 }

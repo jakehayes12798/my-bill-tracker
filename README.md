@@ -1,5 +1,5 @@
 <sub>Created: 2025/08/26 09:44:39
-<br/>Last modified: 2025/08/27 11:26:00
+<br/>Last modified: 2025/08/27 15:10:02
 </sub>
 
 # My Bill Tracker <!-- omit from toc -->
@@ -24,12 +24,16 @@ This app is designed not only as a practical tool, but also as a showcase of my 
 
 ## Features (Planned & In Progress)
 
-- [ ] 📌 Add, edit, and delete recurring bills  
-- 📆 See upcoming due dates on a timeline/calendar view  
-- 💰 Track variances between expected vs. actual amounts  
-- 📊 Forecast future expenses across months  
-- 🔍 Filter and search for specific bills  
-- ☁️ (Future) Sync with a backend for persistent data storage  
+- [x] 📌 Add, edit, and delete recurring bills  
+- [x] 📆 See upcoming due dates on a timeline view  
+- [ ] 💰 Track variances between expected vs. actual amounts  
+- [ ] 📊 Forecast future expenses across months  
+- [ ] 🔍 Filter and search for specific bills  
+- [ ] ☁️ (Future) Sync with a backend for persistent data storage  
+- [ ] 🔒 (Future) Add authentication and authorization
+- [ ] ⚡ (Future) Implement APIs to pull and display amounts owed dynamically
+- [ ] 🏦 (Future) Integrate with a bank account in order to show the current balance
+- [ ] 💸 (Future) **Integrate with bank and biller APIs in order to make payments,** ***directly*** **from the app.**
 
 ---
 
@@ -65,3 +69,8 @@ git clone https://github.com/jakehayes12798/my-bill-tracker.git
 cd my-bill-tracker
 npm install
 npm start
+```
+
+`src\config.ts` is the centralized source of truth regarding project identity and versioning. 
+
+Shoutout to SonarQube for constantly telling me where my code sucks so I can improve, I love you guys <3 
