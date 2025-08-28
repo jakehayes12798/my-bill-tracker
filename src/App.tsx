@@ -109,8 +109,11 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="title">My Bill Tracker</h1>
-        <p className="subtitle">A simple way to track your monthly bills and expenses</p>
+        <img src="/icons/cutecat512.png" alt="The Whisker logo: a cute cat holding money" />
+        <div className="header-text">
+          <h1 className="title">Whisker Bill Tracker</h1>
+          <p className="subtitle">🐱 A simple way to track your monthly bills and expenses 🐾</p>
+        </div>
       </header>
       <main className="app-main">
         <BillInputForm onAddBill={handleAddBill} />

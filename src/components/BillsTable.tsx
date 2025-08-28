@@ -12,8 +12,7 @@ export default function BillsTable({
     <table className="bills-table">
       <thead>
         <tr>
-              <th>Actions</th>         {/* Payment */}
-              <th>Edit</th>
+              <th>Quick Actions</th>         {/* Payment, Edit */}
               <th>Bill Name</th>
               <th>Amount Remaining</th>
               <th>Due Date</th>
@@ -36,8 +35,6 @@ export default function BillsTable({
                         <Payment />
                       </IconButton>
                   </Tooltip>
-                </td>
-                <td>
                     <Tooltip title="Edit this bill">
                       <IconButton
                         className="bill-item-button edit-bill-button"

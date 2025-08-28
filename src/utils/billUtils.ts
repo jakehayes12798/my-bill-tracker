@@ -48,6 +48,7 @@ export function recordPaymentUtil(bill: Bill, paidAmount: number, datePaid: stri
   if (newPaidAmount > bill.totalAmount) {
     throw new Error("Paid amount cannot exceed total amount");
   }
+  datePaid;
   return { ...bill, paidAmount: newPaidAmount };
 }
 

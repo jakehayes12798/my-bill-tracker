@@ -24,8 +24,11 @@ This app is designed not only as a practical tool, but also as a showcase of my 
 
 ## Features (Planned & In Progress)
 
-- [x] 📌 Add, edit, and delete recurring bills  
+- [x] 📌 Add, edit, and delete bills  
 - [x] 📆 See upcoming due dates on a timeline view  
+- [ ] ☁️ Add PWA functionality to be able to install on mobile.
+- [ ] 📆 Add recurring bills with options for monthly, weekly, or specific dates recursion
+- [ ] 📌 Add categorization tags/colors (rent, electric, etc)
 - [ ] 💰 Track variances between expected vs. actual amounts  
 - [ ] 📊 Forecast future expenses across months  
 - [ ] 🔍 Filter and search for specific bills  

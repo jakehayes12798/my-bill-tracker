@@ -24,11 +24,26 @@ body {
 
 /* Header container */
 .app-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   background: white;
   padding: 2rem 3rem;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
+}
+
+.app-header img {
+  height: 100%;            /* try 100% of the flex container's height */
+  max-height: 5rem;        /* optional: cap it so it doesn’t get huge */
+  min-height: 3rem;
+  object-fit: contain;     /* maintain aspect ratio */
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* Title */
