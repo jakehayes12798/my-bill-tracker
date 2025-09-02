@@ -1,4 +1,5 @@
 import type { Bill } from "../components/types/Bill";
+import { billsTable } from "../data_management/airtableClient";
 
 export function getPercentagePaid(bill: Bill): number {
   if (bill.totalAmount === 0) return 0;
@@ -70,3 +71,5 @@ export function editBillUtil(bill: Bill, updatedFields: Partial<Bill>): Bill {
 export function getRemainingBalance(bill: Bill): number {
   return bill.totalAmount - bill.paidAmount;
 }
+
+

@@ -20,6 +20,7 @@ import EditBillDialog from "./components/dialogs/EditBillDialog";
 import Footer from "./components/Footer";
 import { billsTable } from "./data_management/airtableClient";
 import AppHeader from "./components/AppHeader";
+import { airtableCreateBill, airtableDeleteBill, airtableUpdateBill } from "./utils/airtableUtils";
 
 export default function App() {
 
@@ -32,36 +33,62 @@ export default function App() {
       .select({ view: "Grid view" }) // or any Airtable view you made
       .all()
       .then((records) => {
-      const mapped: Bill[] = records.map((r) => ({
-        id: String(r.fields.Id),
+      const mapped: Bill[] = records.map((r) => {
+        console.log(
+          `Found record id ${r.getId()} | Name: ${r.get("Name")} | Due: ${r.get("DueDate")}`
+        ); 
+        return {
+        id: String(r.getId()),
         name: String(r.fields.Name || ""),          // <- force it to a string
         totalAmount: Number(r.fields.TotalAmount) || 0,
         paidAmount: Number(r.fields.PaidAmount) || 0,
         dueDate: r.fields.DueDate || undefined,
         website: r.fields.Website || undefined,
         apiIntegration: r.fields.ApiIntegration || undefined,
-      }));
+      };
+      });
 
     setBills(mapped);
     }).catch((err) => console.error(err));
   }, []);
 
   // ---------- Handlers for CRUD (useCallback for stable refs)
-  const confirmDelete = useCallback((id: string) => {
-    setBills(prev => deleteBillUtil(prev, id));
-  }, []);
+  const confirmDelete = useCallback(async (id: string) => {
+    try {
+      await airtableDeleteBill(id); // <-- Airtable API
+      setBills(prev => deleteBillUtil(prev, id));
+    } catch (err) {
+      console.error("Failed to delete bill:", err);
+    }
+}, []);
 
   /**
    * Applies edits to a specific bill by mapping over any bills with the same id on fields passed in.
    * @param id The id of the bill to edit.
    * @param fields The fields to edit.
    */
-  const applyEdit = useCallback((id: string, fields: Partial<Bill>) => {
-    setBills(prev => prev.map(b => b.id === id ? editBillUtil(b, fields) : b));
+  const applyEdit = useCallback(async (id: string, fields: Partial<Bill>) => {
+      try {
+    const updated = await airtableUpdateBill(id, fields); // <-- Airtable API call
+    setBills(prev => prev.map(b => b.id === id ? updated : b));
+  } catch (err) {
+    console.error("Failed to update bill:", err);
+  }
   }, []);
 
-  const applyPayment = useCallback((id: string, amount: number, date: string) => {
-    setBills(prev => prev.map(b => b.id === id ? recordPaymentUtil(b, amount, date) : b));
+
+  const applyPayment = useCallback(
+      async (bill: Bill, amount: number, date: string) => {
+    try {
+      const updated = await airtableUpdateBill(bill.id, 
+        {
+          paidAmount: bill.paidAmount + amount,
+        }
+    );
+      setBills(prev => prev.map(b => b.id === bill.id ? updated : b));
+    } catch (err) {
+      console.error("Failed to record payment:", err);
+    }
   }, []);
 
   // ------------ Dialog states
@@ -101,33 +128,39 @@ export default function App() {
 
   /* Payment Dialog Helpers */
   const [paymentTarget, setPaymentTarget] = useState<Bill | null>(null);
-  const openPayment = (bill: Bill) => (setPaymentTarget(bill));
+  const openPayment = (bill: Bill) => {
+    console.log("Opening payment for bill:", bill.id, bill.name);
+    setPaymentTarget(bill);
+  };
   const closePayment = () => setPaymentTarget(null);
-  const onConfirmRecordPayment = (paymentAmount: number, datePaid: string) => {
+  const onConfirmRecordPayment = async (paymentAmount: number, datePaid: string) => {
+    console.log("Confirming payment for target:", paymentTarget?.id, paymentTarget, paymentAmount, datePaid);
     if (!paymentTarget) return;
-    applyPayment(paymentTarget.id, paymentAmount, datePaid);
+    await applyPayment(paymentTarget, paymentAmount, datePaid);
+    console.log("Confirmed payment for target:", paymentTarget);
     closePayment();
   };
 
 
 
-  // TODO: make a new add bills using API
-  /**
-   * Handles the addition of a new bill to the state.
-   * @param bill The bill object containing name, amount, and due date.
-   *
-  const handleAddBill = (bill: Bill) => {
-    console.log("Adding bill: ", { billName: bill.name, billAmount: bill.totalAmount, dueDate: bill.dueDate });
-    // Add the bill to the state array.
-    setBills((prevBills) => [...prevBills, bill]);
-  };
-  */
+
+  const handleAddBill = useCallback(async (bill: Omit<Bill, 'id'>) => {
+    try {
+      // Use the Airtable API to create a new bill
+      const newBill = await airtableCreateBill(bill);
+      // Add the newly created bill to the bills list
+      setBills(prev => [...prev, newBill]);
+    } catch (err) {
+      console.error("Failed to create bill:", err);
+    }
+  }, []);
+
 
   return (
     <div className="app">
       <AppHeader />
       <main className="app-main">
-        {/* //TODO <BillInputForm onAddBill={handleAddBill} />*/}
+        <BillInputForm onAddBill={handleAddBill} />
         <BillsTable
         bills={sortedBills}
         onRequestDelete={(bill) => openDelete(bill)}

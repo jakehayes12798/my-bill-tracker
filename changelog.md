@@ -18,3 +18,7 @@
 ## 0.2.0 (2025-09-02)
 
 - [x] added Airtable API integration for READ ONLY (still need to add the ability to edit, add, and delete bills via Whisker)
+
+## 0.3.0 (2025-09-02)
+
+- [x] added Airtable API integration for all CRUD operations (I think)
