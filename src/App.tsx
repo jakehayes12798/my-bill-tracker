@@ -8,7 +8,7 @@
  * By assigning away all the presentation, App.tsx can focus solely on logic and state.
  */
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import "./App.css";
 import BillInputForm from "./components/BillInputForm";
 import type { Bill } from "./components/types/Bill";
@@ -18,11 +18,33 @@ import RecordPaymentDialog from "./components/dialogs/RecordPaymentDialog";
 import DeleteBillDialog from "./components/dialogs/DeleteBillDialog";
 import EditBillDialog from "./components/dialogs/EditBillDialog";
 import Footer from "./components/Footer";
+import { billsTable } from "./data_management/airtableClient";
+import AppHeader from "./components/AppHeader";
 
 export default function App() {
 
   const [bills, setBills] = useState<Bill[]>([]);
   const sortedBills = useMemo(() => sortBills(bills), [bills]); // sorts whenever the bills array changes
+
+  
+  useEffect(() => {
+    billsTable
+      .select({ view: "Grid view" }) // or any Airtable view you made
+      .all()
+      .then((records) => {
+      const mapped: Bill[] = records.map((r) => ({
+        id: String(r.fields.Id),
+        name: String(r.fields.Name || ""),          // <- force it to a string
+        totalAmount: Number(r.fields.TotalAmount) || 0,
+        paidAmount: Number(r.fields.PaidAmount) || 0,
+        dueDate: r.fields.DueDate || undefined,
+        website: r.fields.Website || undefined,
+        apiIntegration: r.fields.ApiIntegration || undefined,
+      }));
+
+    setBills(mapped);
+    }).catch((err) => console.error(err));
+  }, []);
 
   // ---------- Handlers for CRUD (useCallback for stable refs)
   const confirmDelete = useCallback((id: string) => {
@@ -75,15 +97,6 @@ export default function App() {
     applyEdit(editTarget.id, editValues);
     closeEdit();
   };
-/*  useEffect(() => {
-  if (editTarget) {
-    const initialValues: Record<string, string | number> = {};
-    billEditSchema.forEach(({ key }) => {
-      initialValues[key] = editTarget[key as keyof Bill] ?? "";
-    });
-    setEditValues(initialValues);
-  }
-}, [editTarget]); */
 
 
   /* Payment Dialog Helpers */
@@ -96,27 +109,25 @@ export default function App() {
     closePayment();
   };
 
+
+
+  // TODO: make a new add bills using API
   /**
    * Handles the addition of a new bill to the state.
    * @param bill The bill object containing name, amount, and due date.
-   */
+   *
   const handleAddBill = (bill: Bill) => {
     console.log("Adding bill: ", { billName: bill.name, billAmount: bill.totalAmount, dueDate: bill.dueDate });
     // Add the bill to the state array.
     setBills((prevBills) => [...prevBills, bill]);
   };
+  */
 
   return (
     <div className="app">
-      <header className="app-header">
-        <img src="/icons/cutecat512.png" alt="The Whisker logo: a cute cat holding money" />
-        <div className="header-text">
-          <h1 className="title">Whisker Bill Tracker</h1>
-          <p className="subtitle">🐱 A simple way to track your monthly bills and expenses 🐾</p>
-        </div>
-      </header>
+      <AppHeader />
       <main className="app-main">
-        <BillInputForm onAddBill={handleAddBill} />
+        {/* //TODO <BillInputForm onAddBill={handleAddBill} />*/}
         <BillsTable
         bills={sortedBills}
         onRequestDelete={(bill) => openDelete(bill)}

@@ -2,7 +2,7 @@
 
 - [x] Move Edit and Record Payment modals to their own component classes
 
-- [ ] Add API integrations (details TBD)
+- [ ] Move secrets from .env.local to somewhere server-side (Vercel?)
 
 # Changelog
 
@@ -13,4 +13,8 @@
 ## 2025-08-28
 
 - [x] added new app icon
-- [x] added progressive web application 
+- [x] added progressive web application scaffolding
+
+## 0.2.0 (2025-09-02)
+
+- [x] added Airtable API integration for READ ONLY (still need to add the ability to edit, add, and delete bills via Whisker)

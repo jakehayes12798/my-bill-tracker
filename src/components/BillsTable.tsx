@@ -48,7 +48,7 @@ export default function BillsTable({
                 <td>{bill.name}</td>
                 <td>${(bill.totalAmount - bill.paidAmount).toFixed(2)}</td>
                 <td>{bill.dueDate || "N/A"}</td>
-                <td>{bill.totalAmount > 0 ? `${Math.round(bill.paidAmount)} / ${Math.round(bill.totalAmount)}` : "N/A"}</td>
+                <td>{bill.totalAmount > 0 ? `${(bill.paidAmount).toFixed(2)} / ${(bill.totalAmount).toFixed(2)}` : "N/A"}</td>
                 <td>
                     <Tooltip title="Payment progress">
                         <LinearProgress
