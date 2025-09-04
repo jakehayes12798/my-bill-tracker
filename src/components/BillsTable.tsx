@@ -1,6 +1,7 @@
 import { Payment, EditSquare, Delete } from "@mui/icons-material";
 import { Tooltip, IconButton, LinearProgress } from "@mui/material";
 import type { BillsTableProps } from "./types/BillsTableProps";
+import LinearProgressWithLabel from "./LinearProgressWithLabel";
 
 export default function BillsTable({
   bills,
@@ -45,15 +46,19 @@ export default function BillsTable({
                       </IconButton>
                     </Tooltip>
                 </td>
-                <td>{bill.name}</td>
+                <td> 
+                  {bill.website ?
+                    ( <a href={bill.website} target="_blank" rel="noopener noreferrer"> {bill.name} </a> ) 
+                    : ( bill.name )} 
+                </td>
                 <td>${(bill.totalAmount - bill.paidAmount).toFixed(2)}</td>
                 <td>{bill.dueDate || "N/A"}</td>
                 <td>{bill.totalAmount > 0 ? `${(bill.paidAmount).toFixed(2)} / ${(bill.totalAmount).toFixed(2)}` : "N/A"}</td>
                 <td>
                     <Tooltip title="Payment progress">
-                        <LinearProgress
-                          variant="determinate" // we know the maximum value
+                        <LinearProgressWithLabel 
                           value={bill.totalAmount > 0 ? (bill.paidAmount / bill.totalAmount) * 100 : 0}
+                          
                         />
                     </Tooltip>
                 </td>

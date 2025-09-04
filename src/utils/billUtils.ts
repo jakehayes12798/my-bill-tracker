@@ -1,5 +1,6 @@
 import type { Bill } from "../components/types/Bill";
 import { billsTable } from "../data_management/airtableClient";
+import { billSchema } from "./formSchemas";
 
 export function getPercentagePaid(bill: Bill): number {
   if (bill.totalAmount === 0) return 0;
@@ -72,4 +73,22 @@ export function getRemainingBalance(bill: Bill): number {
   return bill.totalAmount - bill.paidAmount;
 }
 
+/**
+ * Validates a bill object against the bill schema.
+ * @param values The bill values to validate.
+ * @returns An array of error messages for any validation failures.
+ */
+export function validateBill(values: Partial<Bill>) {
+  const errors: string[] = [];
 
+  for (const field of billSchema) {
+    if (field.required && field.editable) {
+      const val = values[field.key as keyof Bill];
+      if (val === undefined || val === null || val === "" || (field.type === "number" && Number(val) <= 0)) {
+        errors.push(`${field.label} is required`);
+      }
+    }
+  }
+
+  return errors;
+}

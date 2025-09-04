@@ -22,3 +22,9 @@
 ## 0.3.0 (2025-09-02)
 
 - [x] added Airtable API integration for all CRUD operations (I think)
+
+## 0.3.1 (2025-09-03)
+
+- [x] fixed some CSS issues
+- [x] add the AddBillDialog option to replace the webform
+- [x] made the billSchema more robust

@@ -12,7 +12,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import "./App.css";
 import BillInputForm from "./components/BillInputForm";
 import type { Bill } from "./components/types/Bill";
-import { deleteBillUtil, editBillUtil, recordPaymentUtil, sortBills } from "./utils/billUtils";
+import { deleteBillUtil, sortBills } from "./utils/billUtils";
 import BillsTable from "./components/BillsTable";
 import RecordPaymentDialog from "./components/dialogs/RecordPaymentDialog";
 import DeleteBillDialog from "./components/dialogs/DeleteBillDialog";
@@ -21,6 +21,7 @@ import Footer from "./components/Footer";
 import { billsTable } from "./data_management/airtableClient";
 import AppHeader from "./components/AppHeader";
 import { airtableCreateBill, airtableDeleteBill, airtableUpdateBill } from "./utils/airtableUtils";
+import AddBillDialog from "./components/dialogs/AddBillDialog";
 
 export default function App() {
 
@@ -53,6 +54,9 @@ export default function App() {
   }, []);
 
   // ---------- Handlers for CRUD (useCallback for stable refs)
+
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
+
   const confirmDelete = useCallback(async (id: string) => {
     try {
       await airtableDeleteBill(id); // <-- Airtable API
@@ -142,7 +146,17 @@ export default function App() {
   };
 
 
+  const closeAdd = () => setIsAddDialogOpen(false);
 
+  const onConfirmAdd = (newBill: Partial<Bill>) => {
+    const fullBill = newBill as Omit<Bill, "id">;
+    // validate required fields
+    if (fullBill.name && fullBill.name.trim().length > 0) {
+      handleAddBill(fullBill);
+    } else {
+      console.error("Bill must have a name");
+    }
+  };
 
   const handleAddBill = useCallback(async (bill: Omit<Bill, 'id'>) => {
     try {
@@ -160,13 +174,12 @@ export default function App() {
     <div className="app">
       <AppHeader />
       <main className="app-main">
-        <BillInputForm onAddBill={handleAddBill} />
         <BillsTable
-        bills={sortedBills}
-        onRequestDelete={(bill) => openDelete(bill)}
-        onRequestEdit={(bill) => openEdit(bill)}
-        onRequestRecordPayment={(bill) => openPayment(bill)}
-      />
+          bills={sortedBills}
+          onRequestDelete={(bill) => openDelete(bill)}
+          onRequestEdit={(bill) => openEdit(bill)}
+          onRequestRecordPayment={(bill) => openPayment(bill)}
+        />
       </main>
 
 
@@ -200,6 +213,24 @@ export default function App() {
           isOpenDialog={!!deleteTarget}
         />
       )}
+
+      {/* Add dialog */
+      isAddDialogOpen && (
+      <AddBillDialog
+        closeAdd={closeAdd}
+        onConfirmAdd={onConfirmAdd}
+        isOpenDialog={isAddDialogOpen}
+      />)}
+
+      {/* Add a bill via floating button */}
+      <button
+        className="fab"
+        onClick={() => {
+          setIsAddDialogOpen(true);
+        }}
+      >
+        +
+      </button>
 
       <Footer />
   </div>
