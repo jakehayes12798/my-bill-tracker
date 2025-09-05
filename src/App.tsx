@@ -10,9 +10,8 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import "./App.css";
-import BillInputForm from "./components/BillInputForm";
 import type { Bill } from "./components/types/Bill";
-import { deleteBillUtil, sortBills } from "./utils/billUtils";
+import { deleteBillUtil, processBills } from "./utils/billUtils";
 import BillsTable from "./components/BillsTable";
 import RecordPaymentDialog from "./components/dialogs/RecordPaymentDialog";
 import DeleteBillDialog from "./components/dialogs/DeleteBillDialog";
@@ -22,11 +21,13 @@ import { billsTable } from "./data_management/airtableClient";
 import AppHeader from "./components/AppHeader";
 import { airtableCreateBill, airtableDeleteBill, airtableUpdateBill } from "./utils/airtableUtils";
 import AddBillDialog from "./components/dialogs/AddBillDialog";
+import DaysAheadDropdown from "./components/DaysAheadDropdown";
 
 export default function App() {
 
   const [bills, setBills] = useState<Bill[]>([]);
-  const sortedBills = useMemo(() => sortBills(bills), [bills]); // sorts whenever the bills array changes
+  const [daysAhead, setDaysAhead] = useState<number>(60);
+  const sortedBills = useMemo(() => processBills(bills, daysAhead), [bills, daysAhead]); // sorts whenever the bills array changes
 
   
   useEffect(() => {
@@ -48,7 +49,6 @@ export default function App() {
         apiIntegration: r.fields.ApiIntegration || undefined,
       };
       });
-
     setBills(mapped);
     }).catch((err) => console.error(err));
   }, []);
@@ -174,11 +174,15 @@ export default function App() {
     <div className="app">
       <AppHeader />
       <main className="app-main">
+        {/* Filter selector */}
+        <DaysAheadDropdown daysAhead={daysAhead} setDaysAhead={setDaysAhead} />
+
         <BillsTable
-          bills={sortedBills}
+          processedBills={sortedBills}
           onRequestDelete={(bill) => openDelete(bill)}
           onRequestEdit={(bill) => openEdit(bill)}
           onRequestRecordPayment={(bill) => openPayment(bill)}
+          daysAhead={daysAhead}
         />
       </main>
 

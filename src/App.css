@@ -133,6 +133,24 @@ body::before {
   transition: background-color 0.3s ease;
 }
 
+.bill-beyond-cutoff {
+  opacity: 0.5;         /* fade out */
+  color: #999;          /* dim text */
+}
+
+.bill-paid {
+  text-decoration: line-through;
+  color: #666;
+}
+
+.future-bills-row {
+  font-style: italic;
+  color: #666;
+  text-align: center;
+  background: #fafafa;
+}
+
+
 .bill-item:hover {
   background-color: #f1f5f9; /* softer gray */
   transform: scale(1.01);

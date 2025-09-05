@@ -28,3 +28,9 @@
 - [x] fixed some CSS issues
 - [x] add the AddBillDialog option to replace the webform
 - [x] made the billSchema more robust
+
+## 0.3.2 (2025-09-05)
+
+- [x] sorted bills by unpaid within 60 days, paid within 60 days, unpaid after
+- [x] added date dropdown to parameterize the search
+- [x] enabled collapsing of bills in order to later allow for recurring bills

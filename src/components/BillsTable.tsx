@@ -1,82 +1,75 @@
-import { Payment, EditSquare, Delete } from "@mui/icons-material";
-import { Tooltip, IconButton, LinearProgress } from "@mui/material";
+import React from "react";
+import BillRow from "./BillRow";
 import type { BillsTableProps } from "./types/BillsTableProps";
-import LinearProgressWithLabel from "./LinearProgressWithLabel";
+import type { ProcessedBills } from "./types/ProcessedBills";
+import type { Bill } from "./types/Bill";
 
 export default function BillsTable({
-  bills,
+  processedBills,
   onRequestDelete,
   onRequestEdit,
   onRequestRecordPayment,
+  daysAhead
 }: Readonly<BillsTableProps>) {
+
+  const [showFuture, setShowFuture] = React.useState(false);
+
   return (
     <table className="bills-table">
       <thead>
         <tr>
-              <th>Quick Actions</th>         {/* Payment, Edit */}
-              <th>Bill Name</th>
-              <th>Amount Remaining</th>
-              <th>Due Date</th>
-              <th>Amount Paid / Total:</th>
-              <th>Progress</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bills.map(bill => (
-              <tr key={bill.id} className="bill-item">
-                <td>
-                  <Tooltip title="Record a payment for this bill">
-                      <IconButton
-                        className="bill-item-button record-payment-button"
-                        onClick={() => onRequestRecordPayment(bill)}
-                        color="secondary"
-                        disabled={bill.paidAmount >= bill.totalAmount}
-                      >
-                        <Payment />
-                      </IconButton>
-                  </Tooltip>
-                    <Tooltip title="Edit this bill">
-                      <IconButton
-                        className="bill-item-button edit-bill-button"
-                        onClick={() => onRequestEdit(bill)}
-                        color="primary"
-                      >
-                        <EditSquare />
-                      </IconButton>
-                    </Tooltip>
-                </td>
-                <td> 
-                  {bill.website ?
-                    ( <a href={bill.website} target="_blank" rel="noopener noreferrer"> {bill.name} </a> ) 
-                    : ( bill.name )} 
-                </td>
-                <td>${(bill.totalAmount - bill.paidAmount).toFixed(2)}</td>
-                <td>{bill.dueDate || "N/A"}</td>
-                <td>{bill.totalAmount > 0 ? `${(bill.paidAmount).toFixed(2)} / ${(bill.totalAmount).toFixed(2)}` : "N/A"}</td>
-                <td>
-                    <Tooltip title="Payment progress">
-                        <LinearProgressWithLabel 
-                          value={bill.totalAmount > 0 ? (bill.paidAmount / bill.totalAmount) * 100 : 0}
-                          
-                        />
-                    </Tooltip>
-                </td>
-                <td>
-                    <Tooltip title="Delete this bill">
-                      <IconButton
-                        className="bill-item-button delete-bill-button"
-                        onClick={() => onRequestDelete(bill)}
-                        color="error"
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Tooltip>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          <th>Quick Actions</th>
+          <th>Bill Name</th>
+          <th>Amount Remaining</th>
+          <th>Due Date</th>
+          <th>Amount Paid / Total</th>
+          <th>Progress</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {processedBills.upcoming.map((bill: Bill) => (
+  <BillRow 
+    key={bill.id} 
+    bill={bill} 
+    onRequestDelete={onRequestDelete}
+    onRequestEdit={onRequestEdit}
+    onRequestRecordPayment={onRequestRecordPayment}
+  />
+))}
 
-        );
+{processedBills.future.length > 0 && (
+  <tr className="future-bills-row">
+    <td colSpan={5}>
+      {processedBills.future.length} more bills due after {daysAhead} days
+      <button onClick={() => setShowFuture(!showFuture)}>
+        {showFuture ? "Hide" : "Show"}
+      </button>
+    </td>
+  </tr>
+)}
+
+{showFuture && processedBills.future.map(bill => (
+    <BillRow 
+    key={bill.id} 
+    bill={bill} 
+    onRequestDelete={onRequestDelete}
+    onRequestEdit={onRequestEdit}
+    onRequestRecordPayment={onRequestRecordPayment}
+  />
+))}
+
+{processedBills.noDueDateUnpaid.map(bill => (
+    <BillRow 
+    key={bill.id} 
+    bill={bill} 
+    onRequestDelete={onRequestDelete}
+    onRequestEdit={onRequestEdit}
+    onRequestRecordPayment={onRequestRecordPayment}
+  />
+))}
+
+      </tbody>
+    </table>
+  );
 }

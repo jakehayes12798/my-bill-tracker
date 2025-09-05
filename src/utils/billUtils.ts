@@ -1,4 +1,5 @@
 import type { Bill } from "../components/types/Bill";
+import type { ProcessedBills } from "../components/types/ProcessedBills";
 import { billsTable } from "../data_management/airtableClient";
 import { billSchema } from "./formSchemas";
 
@@ -26,6 +27,35 @@ export function sortBills(bills: Bill[], sortBy: keyof Bill = "dueDate", ascendi
     }
   });
 }
+
+/**
+ * Applies more granular processing logic to the bills array for display purposes.
+ * @param bills 
+ * @param daysFromToday Number of days from today to consider for "upcoming" bills (default is 60).
+ * @returns A new array of bills processed according to the specified logic.
+ */
+export function processBills(bills: Bill[], daysFromToday: number = 60) : ProcessedBills {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() + daysFromToday);
+
+  const byDate = (a: Bill, b: Bill) =>
+    new Date(a.dueDate ?? "").getTime() - new Date(b.dueDate ?? "").getTime();
+
+  const upcoming = bills.filter(
+    b => b.dueDate && new Date(b.dueDate) <= cutoff
+  ).sort(byDate);
+
+  const future = bills.filter(
+    b => b.dueDate && new Date(b.dueDate) > cutoff
+  ).sort(byDate);
+
+  const noDueDateUnpaid = bills.filter(
+    b => !b.dueDate && b.paidAmount < b.totalAmount
+  );
+
+  return { upcoming, future, noDueDateUnpaid };
+}
+
 
 /**
  * Deletes a bill from the list of bills.
