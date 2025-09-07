@@ -4,7 +4,7 @@
 
 - [ ] Move secrets from .env.local to somewhere server-side (Vercel?)
 
-# Changelog
+## Changelog
 
 ## 2025-08-27
 
@@ -34,3 +34,11 @@
 - [x] sorted bills by unpaid within 60 days, paid within 60 days, unpaid after
 - [x] added date dropdown to parameterize the search
 - [x] enabled collapsing of bills in order to later allow for recurring bills
+
+## 0.3.3 (2025-09-06)
+
+- [x] added new scaffolding for recurring bills (using lazy 12-month lookahead recursion)
+- [x] added a universal toast provider to centralize toast alerts
+- [x] cleaned up many unused imports
+- [x] centralized the billSchema to the Bill.ts file to allow for easier synchronicity
+- [x] renamed the package.json from "Whisper Bill Tracker" to "whisper-bill-tracker" for legality

@@ -34,21 +34,21 @@ export default function App() {
     billsTable
       .select({ view: "Grid view" }) // or any Airtable view you made
       .all()
-      .then((records) => {
-      const mapped: Bill[] = records.map((r) => {
-        console.log(
-          `Found record id ${r.getId()} | Name: ${r.get("Name")} | Due: ${r.get("DueDate")}`
-        ); 
-        return {
-        id: String(r.getId()),
-        name: String(r.fields.Name || ""),          // <- force it to a string
-        totalAmount: Number(r.fields.TotalAmount) || 0,
-        paidAmount: Number(r.fields.PaidAmount) || 0,
-        dueDate: r.fields.DueDate || undefined,
-        website: r.fields.Website || undefined,
-        apiIntegration: r.fields.ApiIntegration || undefined,
-      };
-      });
+      .then((records) => 
+      {
+        const asString = (val: unknown): string | undefined => 
+          val != null ? String(val) : undefined;
+
+        const mapped: Bill[] = records.map((r) => ({
+          id: String(r.getId()),
+          name: asString(r.fields.Name) || "",
+          totalAmount: Number(r.fields.TotalAmount) || 0,
+          paidAmount: Number(r.fields.PaidAmount) || 0,
+          dueDate: asString(r.fields.DueDate),
+          website: asString(r.fields.Website),
+          apiIntegration: asString(r.fields.ApiIntegration),
+      }));
+
     setBills(mapped);
     }).catch((err) => console.error(err));
   }, []);
@@ -84,6 +84,8 @@ export default function App() {
   const applyPayment = useCallback(
       async (bill: Bill, amount: number, date: string) => {
     try {
+      date; // TODO: use this value to store payment records
+      // For now, just update the paidAmount on the bill
       const updated = await airtableUpdateBill(bill.id, 
         {
           paidAmount: bill.paidAmount + amount,
@@ -158,16 +160,39 @@ export default function App() {
     }
   };
 
-  const handleAddBill = useCallback(async (bill: Omit<Bill, 'id'>) => {
-    try {
-      // Use the Airtable API to create a new bill
+  /**
+   * Handles adding a new bill, including support for recurring monthly bills.
+   * If the bill is recurring monthly, it creates 12 bills with incremented due dates.
+   * Otherwise, it creates a single bill.
+   * @param bill The bill to add (without an id).
+   */
+const handleAddBill = useCallback(async (bill: Omit<Bill, "id">) => {
+  try {
+    if (bill.recurrence === "monthly" && bill.dueDate) {
+      // Parse base date
+      const startDate = new Date(bill.dueDate);
+      const newBills: Omit<Bill, "id">[] = [];
+
+      for (let i = 0; i < 12; i++) {
+        const due = new Date(startDate);
+        due.setMonth(due.getMonth() + i);
+
+        newBills.push({ ...bill, dueDate: due.toISOString().split("T")[0] });
+      }
+
+      // Batch insert
+      const created = await Promise.all(newBills.map(b => airtableCreateBill(b)));
+      setBills(prev => [...prev, ...created]);
+    } else {
+      // Normal single bill
       const newBill = await airtableCreateBill(bill);
-      // Add the newly created bill to the bills list
       setBills(prev => [...prev, newBill]);
-    } catch (err) {
-      console.error("Failed to create bill:", err);
     }
-  }, []);
+  } catch (err) {
+    console.error("Failed to create bill:", err);
+  }
+}, []);
+
 
 
   return (

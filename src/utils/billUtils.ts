@@ -1,7 +1,6 @@
 import type { Bill } from "../components/types/Bill";
 import type { ProcessedBills } from "../components/types/ProcessedBills";
-import { billsTable } from "../data_management/airtableClient";
-import { billSchema } from "./formSchemas";
+import { billSchema } from "../components/types/Bill";
 
 export function getPercentagePaid(bill: Bill): number {
   if (bill.totalAmount === 0) return 0;

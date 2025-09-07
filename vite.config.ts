@@ -30,11 +30,11 @@ export default defineConfig({
 
       // Web app manifest
       manifest: {
-        name: 'My Bill Tracker',
-        short_name: 'Bills',
+        name: 'Whisker Bill Tracker',
+        short_name: 'Whisker',
         description: 'Track bills and payments on the go.',
-        theme_color: '#0ea5e9',
-        background_color: '#ffffff',
+        theme_color: '#3fa3b5',
+        background_color: '#f9fafb',
         display: 'standalone',
         start_url: '/',
         scope: '/',

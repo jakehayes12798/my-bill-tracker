@@ -1,7 +1,7 @@
 {
-  "name": "Whisker Bill Tracker",
+  "name": "whisker-bill-tracker",
   "private": true,
-  "version": "0.3.2",
+  "version": "0.3.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -33,7 +33,7 @@
     "globals": "^16.3.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2",
+    "vite": "^7.1.4",
     "vite-plugin-pwa": "^1.0.3",
     "workbox-window": "^7.3.0"
   }

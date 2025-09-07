@@ -1,0 +1,20 @@
+{
+  "name": "Whisker Bill Tracker",
+  "short_name": "Whisker",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#3fa3b5",
+  "icons": [
+    {
+      "src": "/icons/cutecat192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/cutecat512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

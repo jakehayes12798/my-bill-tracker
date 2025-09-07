@@ -1,7 +1,6 @@
 import React from "react";
 import BillRow from "./BillRow";
 import type { BillsTableProps } from "./types/BillsTableProps";
-import type { ProcessedBills } from "./types/ProcessedBills";
 import type { Bill } from "./types/Bill";
 
 export default function BillsTable({

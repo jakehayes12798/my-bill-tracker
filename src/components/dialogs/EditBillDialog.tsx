@@ -1,9 +1,11 @@
 import { Save } from "@mui/icons-material";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Alert, Snackbar } from "@mui/material";
-import { billSchema } from "../../utils/formSchemas";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { billSchema } from "../types/Bill";
 import type { Bill } from "../types/Bill";
 import { useEffect, useRef, useState } from "react";
 import { validateBill } from "../../utils/billUtils";
+import BillFormFields from "../BillFormFields";
+import { useToast } from "../ToastProvider";
 
 
 type EditBillDialogProps = Readonly<{
@@ -33,16 +35,19 @@ export default function EditBillDialog({
     const [editValues, setEditValues] = useState<Partial<Bill>>(
         billSchema.filter(f => f.editable).reduce(
             (partialBill, { key }) => {
-            partialBill[key] = editTarget[key as keyof Bill] ?? "";
+            const value = editTarget[key];
+            if (typeof value === "string" || typeof value === "number") {
+              partialBill[key] = value;
+            } else {
+              partialBill[key] = ""; // or 0, or undefined, as appropriate
+            }
             return partialBill;
         }
         , {} as Record<string, string | number>)
     );
 
 
-
-    const [toast, setToast] = useState<{ message: string; severity: "success" | "error" | "info" | "warning" } | null>(null);
-
+    const { showToast } = useToast();
 
     /**
      * Handles the confirmation click event by passing through to {@link onConfirmEdit}.
@@ -50,7 +55,7 @@ export default function EditBillDialog({
     function handleConfirmClick() {
       const errors = validateBill(editValues);
       if (errors.length > 0) {
-        setToast({ message: errors.join(", "), severity: "error" });
+        showToast({ message: errors.join(", "), severity: "error" });
         return;
       }
       onConfirmEdit(editValues);
@@ -70,49 +75,15 @@ export default function EditBillDialog({
     }, [isOpenDialog]);
 
     return (
-      <>
         <Dialog open={isOpenDialog} onClose={closeEdit}>
         <DialogTitle>Edit {editTarget.name}</DialogTitle>
         <DialogContent>
-          {/* Blow apart the editTarget and create form fields for each of the USER EDITABLE fields that we've defined in the Schema for the bill */}
-            <fieldset>
-              {billSchema.filter(f => f.editable).map(({ key, label, type, required }, indexCounter) => (
-                <div key={key}>
-                  <label htmlFor={key}>{label}{required && " *"}:</label>
-                  <input
-                    id={key}
-                    name={key}
-                    type={type}
-                    value={editValues[key] ?? ""}
-                    onChange={e => setEditValues(prev => ({
-                      ...prev,
-                      [key]: type === "number" ? parseFloat(e.target.value) || 0 : e.target.value
-                    }))}
-                    // attach the default ref to the first input
-                    ref={indexCounter === 0 ? defaultFocusRef : undefined}
-                  />
-                </div>
-              ))}
-            </fieldset>
+          <BillFormFields values={editValues} setValues={setEditValues} defaultFocusRef={defaultFocusRef} />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeEdit} color="error" variant="outlined">Cancel</Button>
           <Button onClick={handleConfirmClick} color="primary" variant="contained" startIcon={<Save />}>Save Changes</Button>
         </DialogActions>
         </Dialog>
-            {/* Snackbar Toast */}
-            <Snackbar
-              open={!!toast}
-              autoHideDuration={3000}
-              onClose={() => setToast(null)}
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
-              {toast && (
-                <Alert severity={toast.severity} onClose={() => setToast(null)} sx={{ width: "100%" }}>
-                  {toast.message}
-                </Alert>
-              )}
-            </Snackbar>
-            </>
     );
 }
